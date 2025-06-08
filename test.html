@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedTeam Inspector Test</title>
+</head>
+<body>
+    <h1>RedTeam Inspector Test Page</h1>
+    <p>Open the browser console to see test results.</p>
+    
+    <script>
+        // Test data
+        window.testData = {
+            apiKey: 'test_api_key_12345',
+            password: 'testPassword123',
+            normalData: 'This is normal data'
+        };
+        
+        localStorage.setItem('authToken', 'test_token_xyz');
+    </script>
+    
+    <script src="redteam-inspector.js"></script>
+    
+    <script>
+        // Wait for inspector to load
+        setTimeout(() => {
+            console.log('Running tests...');
+            
+            // Test 1: Check if inspector loaded
+            if (window.redteamInspector) {
+                console.log('✓ Test 1 passed: Inspector loaded');
+            } else {
+                console.error('✗ Test 1 failed: Inspector not loaded');
+            }
+            
+            // Test 2: Check if UI panel exists
+            if (document.getElementById('redteam-panel')) {
+                console.log('✓ Test 2 passed: UI panel created');
+            } else {
+                console.error('✗ Test 2 failed: UI panel not found');
+            }
+            
+            // Test 3: Check scanner results
+            if (window.redteamInspector.scanner.results.length > 0) {
+                console.log('✓ Test 3 passed: Scanner found objects');
+                console.log(`  Found ${window.redteamInspector.scanner.results.length} objects`);
+            } else {
+                console.error('✗ Test 3 failed: No objects scanned');
+            }
+            
+            // Test 4: Check sensitive data detection
+            const sensitive = window.redteamInspector.scanner.results.filter(r => r.isSensitive);
+            if (sensitive.length > 0) {
+                console.log('✓ Test 4 passed: Sensitive data detected');
+                console.log(`  Found ${sensitive.length} sensitive items`);
+            } else {
+                console.error('✗ Test 4 failed: No sensitive data detected');
+            }
+            
+            console.log('Tests completed!');
+        }, 1000);
+    </script>
+</body>
+</html>

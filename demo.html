@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedTeam Inspector Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ff0000;
+            padding-bottom: 10px;
+        }
+        .demo-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .demo-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+        input, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #ff0000;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #cc0000;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+        }
+        .sensitive-data {
+            background: #ffe0e0;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔴 RedTeam Inspector Demo</h1>
+        
+        <div class="warning">
+            <strong>⚠️ WARNING:</strong> This tool is for authorized security testing only. 
+            Unauthorized use may violate laws and regulations. Use responsibly and only on systems you own or have explicit permission to test.
+        </div>
+
+        <div class="demo-section">
+            <h2>Demo Login Form</h2>
+            <p>This form contains sensitive data that will be detected by the inspector:</p>
+            <form class="demo-form" id="loginForm">
+                <input type="text" name="username" placeholder="Username" value="admin">
+                <input type="password" name="password" placeholder="Password" value="secretPassword123">
+                <input type="hidden" name="api_token" value="DEMO_TOKEN_NOT_REAL">
+                <input type="hidden" name="session_id" value="FAKE_SESSION_ID_12345">
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <div class="demo-section">
+            <h2>Sensitive Data in JavaScript</h2>
+            <p>The following sensitive data is stored in JavaScript variables:</p>
+            <div class="sensitive-data">
+                <code>window.userCredentials</code> - Contains user authentication data<br>
+                <code>window.apiConfig</code> - Contains API keys and endpoints<br>
+                <code>localStorage.authToken</code> - Contains JWT token
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>How to Use</h2>
+            <p>The RedTeam Inspector has already been loaded on this page. You can:</p>
+            <ol>
+                <li>Look for the red panel in the top-right corner</li>
+                <li>Click on different tabs to explore:
+                    <ul>
+                        <li><strong>Object Scan:</strong> View all JavaScript objects and their properties</li>
+                        <li><strong>Intercepted:</strong> See intercepted network requests and events</li>
+                        <li><strong>Event Listeners:</strong> View all registered event listeners</li>
+                        <li><strong>Statistics:</strong> See summary and export data</li>
+                    </ul>
+                </li>
+                <li>Use the search box to find specific properties or values</li>
+                <li>Click on items to expand and see more details</li>
+                <li>Click on writable properties to edit them</li>
+            </ol>
+        </div>
+
+        <div class="demo-section">
+            <h2>Console Commands</h2>
+            <p>Open the browser console (F12) and try these commands:</p>
+            <div class="code-block">
+// Re-scan all objects
+redteamInspector.scan();
+
+// Find all sensitive data
+redteamInspector.findSensitiveData();
+
+// Execute custom code
+redteamInspector.executeCode('alert("Hello from RedTeam!")');
+
+// Monitor an object for changes
+redteamInspector.monitorObject('window.userCredentials', (action, prop, value) => {
+    console.log(`Object ${action}: ${prop} = ${value}`);
+});
+
+// Export all collected data
+redteamInspector.exportResults();
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo sensitive data
+        window.userCredentials = {
+            username: 'admin',
+            password: 'P@ssw0rd123!',
+            email: 'admin@example.com',
+            role: 'administrator',
+            lastLogin: new Date().toISOString()
+        };
+
+        window.apiConfig = {
+            apiKey: 'DEMO_API_KEY_FOR_TESTING_ONLY',
+            apiSecret: 'FAKE_SECRET_FOR_DEMO',
+            endpoint: 'https://api.example.com/v1',
+            webhookSecret: 'FAKE_WEBHOOK_SECRET'
+        };
+
+        // Store auth token in localStorage
+        localStorage.setItem('authToken', 'FAKE_JWT_TOKEN_FOR_DEMO_PURPOSES_ONLY');
+        localStorage.setItem('userId', '12345');
+        localStorage.setItem('sessionId', 'FAKE_SESSION_ID_12345');
+
+        // Demo form submission
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            console.log('Form submitted (prevented for demo)');
+            
+            // Simulate API call
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                },
+                body: JSON.stringify({
+                    username: e.target.username.value,
+                    password: e.target.password.value,
+                    token: e.target.api_token.value
+                })
+            }).catch(() => console.log('Demo API call (no actual endpoint)'));
+        });
+
+        // Add some event listeners for demo
+        document.addEventListener('click', function(e) {
+            console.log('Document clicked at:', e.clientX, e.clientY);
+        });
+
+        window.addEventListener('resize', function() {
+            console.log('Window resized to:', window.innerWidth, 'x', window.innerHeight);
+        });
+    </script>
+
+    <!-- Load RedTeam Inspector -->
+    <script src="redteam-inspector.js"></script>
+</body>
+</html>
