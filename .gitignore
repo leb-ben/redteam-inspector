@@ -1,0 +1,19 @@
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Personal and temporary files
+PERSONAL_NOTES.txt
+*.tmp
+*.bak
+Problems.txt
+src/redteam-main.js.new
+
+# Logs and debug files
+*.log
+debug/
+
+# Backup directory
+backup/

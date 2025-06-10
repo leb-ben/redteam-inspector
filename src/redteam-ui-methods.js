@@ -13,16 +13,18 @@
                         <span class="intercepting" style="display: none;">●</span>
                     </div>
                     <div class="panel-controls">
-                        <button class="panel-btn" onclick="redteamInspector.minimize()">_</button>
-                        <button class="panel-btn" onclick="redteamInspector.close()">X</button>
+                        <button class="panel-btn minimize-btn">_</button>
+                        <button class="panel-btn close-btn">X</button>
                     </div>
                 </div>
                 <div class="panel-body">
+                    <div class="progress-bar"></div>
                     <div class="panel-tabs">
                         <button class="panel-tab active" data-tab="scan">Object Scan</button>
                         <button class="panel-tab" data-tab="intercept">Intercepted</button>
                         <button class="panel-tab" data-tab="events">Event Listeners</button>
                         <button class="panel-tab" data-tab="stats">Statistics</button>
+                        <button class="panel-tab" data-tab="bypass">2FA Bypass</button>
                     </div>
                     <div class="panel-content" data-content="scan">
                         <input type="text" class="search-box" placeholder="Search properties, values, or types...">
@@ -49,7 +51,17 @@
                                 <div class="stat-label">Intercepted</div>
                             </div>
                         </div>
-                        <button class="export-btn" onclick="redteamInspector.exportResults()">Export All Data</button>
+                        <div class="export-controls">
+                            <button class="export-btn critical" onclick="redteamInspector.exportCriticalFindings()">Export Critical Findings</button>
+                            <button class="export-btn" onclick="redteamInspector.exportFullData()">Export Full Data</button>
+                        </div>
+                    </div>
+                    <div class="panel-content" data-content="bypass" style="display: none;">
+                        <div class="bypass-info">
+                            <h3>2FA Bypass Detection</h3>
+                            <p>This experimental feature attempts to detect and analyze 2FA/OTP implementations.</p>
+                            <button class="panel-btn" id="bypass-btn" disabled>Try 2FA Bypass</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -58,10 +70,59 @@
             this.resultsContainer = document.getElementById('scan-results');
             this.interceptContainer = document.getElementById('intercept-results');
             this.eventContainer = document.getElementById('event-results');
+            this.progressBar = this.panel.querySelector('.progress-bar');
             this.makeDraggable();
+            
+            // Start progress update interval
+            this.startProgressTracking();
+
+            // Add cleanup on window unload and beforeunload
+            window.addEventListener('unload', () => this.cleanup());
+            window.addEventListener('beforeunload', () => this.cleanup());
+        }
+
+        startProgressTracking() {
+            this.progressInterval = setInterval(() => this.updateProgress(), 100);
+        }
+
+        cleanup() {
+            if (this.progressInterval) {
+                clearInterval(this.progressInterval);
+                this.progressInterval = null;
+            }
+        }
+
+        updateProgress() {
+            if (!window.redteamInspector?.scanner) return;
+            
+            const progress = window.redteamInspector.scanner.getProgress();
+            if (progress.progress > 0) {
+                this.progressBar.style.display = 'block';
+                this.progressBar.style.width = `${progress.progress}%`;
+            } else {
+                this.progressBar.style.display = 'none';
+            }
         }
 
         attachEventHandlers() {
+            // Panel controls
+            const minimizeBtn = this.panel.querySelector('.minimize-btn');
+            const closeBtn = this.panel.querySelector('.close-btn');
+
+            minimizeBtn.addEventListener('click', () => {
+                this.panel.classList.toggle('minimized');
+                return 'Panel minimized';
+            });
+
+            closeBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to close RedTeam Inspector?')) {
+                    this.cleanup();
+                    this.panel.remove();
+                    return 'RedTeam Inspector closed';
+                }
+                return 'Close cancelled';
+            });
+
             // Tab switching
             this.panel.querySelectorAll('.panel-tab').forEach(tab => {
                 tab.addEventListener('click', (e) => {
@@ -75,6 +136,12 @@
             searchBox.addEventListener('input', (e) => {
                 this.filterResults(e.target.value);
             });
+
+            // 2FA Bypass functionality
+            const bypassBtn = this.panel.querySelector('#bypass-btn');
+            if (bypassBtn) {
+                bypassBtn.addEventListener('click', () => this.detect2FAImplementation());
+            }
 
             // Listen for intercept events
             window.addEventListener('redteam-intercept', (e) => {
@@ -314,6 +381,42 @@
                 const keys = Object.keys(obj);
                 const preview = keys.slice(0, 10).join(', ') + (keys.length > 10 ? '...' : '');
                 element.innerHTML = `Keys: ${preview} (${keys.length} total)`;
+            }
+        }
+
+        detect2FAImplementation() {
+            const results = window.redteamInspector.scanner.results;
+            const potentialBypass = results.filter(r => {
+                const path = r.path.toLowerCase();
+                return path.includes('2fa') || 
+                       path.includes('otp') ||
+                       path.includes('totp') ||
+                       path.includes('authenticator');
+            });
+
+            const bypassInfo = this.panel.querySelector('.bypass-info');
+            if (potentialBypass.length > 0) {
+                const bypassBtn = this.panel.querySelector('#bypass-btn');
+                bypassBtn.removeAttribute('disabled');
+                
+                bypassInfo.innerHTML += `
+                    <div class="bypass-results">
+                        <h4>Potential 2FA Implementation Found:</h4>
+                        <ul>
+                            ${potentialBypass.map(r => `
+                                <li>${r.path} (${r.type})</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                return 'Potential 2FA implementations found';
+            } else {
+                bypassInfo.innerHTML += `
+                    <div class="bypass-results">
+                        <p>No 2FA implementations detected.</p>
+                    </div>
+                `;
+                return 'No 2FA implementations found';
             }
         }
 
