@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Auto Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success {
+            background: #1b5e20;
+            color: #4caf50;
+        }
+        .info {
+            background: #0d47a1;
+            color: #2196f3;
+        }
+        .error {
+            background: #b71c1c;
+            color: #f44336;
+        }
+        button {
+            background: #bb86fc;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        button:hover {
+            background: #9c6cdc;
+        }
+    </style>
+</head>
+<body>
+    <h1>RedTeam Scanner - Automated Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="loadScanner()">1. Load Scanner</button>
+        <button onclick="testOverlayRemoval()">2. Test Overlay Removal</button>
+        <button onclick="testScanning()">3. Test Security Scan</button>
+        <button onclick="openDemoInFrame()">4. Test on Demo Page</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Status</h2>
+        <div id="status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Demo Frame</h2>
+        <iframe id="demoFrame" src="/demo.html" style="width: 100%; height: 600px; border: 1px solid #666;"></iframe>
+    </div>
+    
+    <!-- Load scanner scripts -->
+    <script src="/src/core/scanner.js"></script>
+    <script src="/src/ui/overlayRemover.js"></script>
+    <script src="/src/ui/resultsDisplay.js"></script>
+    <script src="/src/app.js"></script>
+    
+    <script>
+        function addStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            status.appendChild(div);
+            status.scrollTop = status.scrollHeight;
+        }
+        
+        function loadScanner() {
+            addStatus('Loading RedTeam Scanner...', 'info');
+            
+            if (window.redteamScanner) {
+                addStatus('Scanner already loaded!', 'success');
+                addStatus(`Available commands: ${Object.keys(window.RedTeamScan).join(', ')}`, 'info');
+            } else {
+                addStatus('Scanner not found!', 'error');
+            }
+        }
+        
+        function testOverlayRemoval() {
+            addStatus('Testing overlay removal on demo frame...', 'info');
+            
+            const frame = document.getElementById('demoFrame');
+            if (frame && frame.contentWindow) {
+                // Inject scanner into iframe
+                const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                
+                // Load scripts in iframe
+                const scripts = [
+                    '/src/core/scanner.js',
+                    '/src/ui/overlayRemover.js',
+                    '/src/ui/resultsDisplay.js',
+                    '/src/app.js'
+                ];
+                
+                let loaded = 0;
+                scripts.forEach(src => {
+                    const script = frameDoc.createElement('script');
+                    script.src = src;
+                    script.onload = () => {
+                        loaded++;
+                        if (loaded === scripts.length) {
+                            setTimeout(() => {
+                                if (frame.contentWindow.RedTeamScan) {
+                                    const result = frame.contentWindow.RedTeamScan.removeOverlays();
+                                    addStatus('Overlay removal completed!', 'success');
+                                    addStatus(`Removed ${result.removedCount || 0} elements`, 'info');
+                                    addStatus(`Modified ${result.modifiedCount || 0} elements`, 'info');
+                                } else {
+                                    addStatus('Scanner not available in frame', 'error');
+                                }
+                            }, 1000);
+                        }
+                    };
+                    frameDoc.head.appendChild(script);
+                });
+            }
+        }
+        
+        function testScanning() {
+            addStatus('Starting security scan...', 'info');
+            
+            if (window.RedTeamScan) {
+                window.RedTeamScan.start();
+                addStatus('Security scan initiated!', 'success');
+                addStatus('Check the results display for findings', 'info');
+            } else {
+                addStatus('Scanner not loaded!', 'error');
+            }
+        }
+        
+        function openDemoInFrame() {
+            const frame = document.getElementById('demoFrame');
+            frame.src = '/demo.html';
+            addStatus('Demo page reloaded in frame', 'info');
+        }
+        
+        // Auto-load scanner on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                loadScanner();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

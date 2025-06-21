@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Test</title>
+</head>
+<body>
+    <h1>RedTeam Scanner Test</h1>
+    <p>Click the button below to test the scanner on the demo page:</p>
+    
+    <button onclick="testScanner()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        Test Scanner on Demo Page
+    </button>
+    
+    <div id="status" style="margin-top: 20px;"></div>
+    
+    <script>
+        function testScanner() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<p>Opening demo page with scanner...</p>';
+            
+            // Open demo page in new window
+            const demoWindow = window.open('/demo.html', 'demo', 'width=1200,height=800');
+            
+            // Wait for page to load then inject scanner
+            setTimeout(() => {
+                if (demoWindow) {
+                    // Inject scanner scripts
+                    const scripts = [
+                        '/src/core/scanner.js',
+                        '/src/ui/overlayRemover.js',
+                        '/src/ui/resultsDisplay.js',
+                        '/src/app.js'
+                    ];
+                    
+                    scripts.forEach((src, index) => {
+                        setTimeout(() => {
+                            const script = demoWindow.document.createElement('script');
+                            script.src = src;
+                            demoWindow.document.head.appendChild(script);
+                            
+                            if (index === scripts.length - 1) {
+                                // After all scripts loaded, run tests
+                                setTimeout(() => {
+                                    status.innerHTML += '<p>Scanner loaded! Testing features...</p>';
+                                    
+                                    // Test overlay removal
+                                    setTimeout(() => {
+                                        if (demoWindow.RedTeamScan) {
+                                            status.innerHTML += '<p>1. Testing overlay removal...</p>';
+                                            demoWindow.RedTeamScan.removeOverlays();
+                                            
+                                            // Test scanning
+                                            setTimeout(() => {
+                                                status.innerHTML += '<p>2. Starting security scan...</p>';
+                                                demoWindow.RedTeamScan.start();
+                                            }, 2000);
+                                        }
+                                    }, 1000);
+                                }, 1000);
+                            }
+                        }, index * 500);
+                    });
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
