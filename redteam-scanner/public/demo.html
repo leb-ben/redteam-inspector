@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Page - Security Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .blur-content {
+            filter: blur(5px);
+            padding: 20px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+        .paywall-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .paywall-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .hidden-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Paywall Overlay -->
+    <div class="paywall-overlay" id="paywall">
+        <div class="paywall-content">
+            <h2>Subscribe to Continue Reading</h2>
+            <p>This content is for premium members only.</p>
+            <button onclick="alert('Subscribe clicked')">Subscribe Now</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Demo Page for Security Testing</h1>
+        
+        <!-- Blurred Content -->
+        <div class="blur-content">
+            <h2>This content is blurred</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. This text should be unblurred by the scanner.</p>
+        </div>
+        
+        <!-- Hidden sensitive data in comments -->
+        <!-- API_KEY: sk-1234567890abcdef1234567890abcdef -->
+        <!-- Database URL: mongodb://admin:password123@localhost:27017/mydb -->
+        
+        <!-- Exposed API endpoints -->
+        <script>
+            const config = {
+                apiKey: "AIzaSyD-1234567890abcdefghijklmnop",
+                apiEndpoint: "https://api.example.com/v1/users",
+                secretToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+                dbConnection: "postgres://user:pass@localhost:5432/database",
+                awsKey: "AKIAIOSFODNN7EXAMPLE"
+            };
+            
+            // Vulnerable postMessage
+            window.addEventListener("message", function(e) {
+                eval(e.data);
+            });
+            
+            // PostMessage with wildcard origin
+            parent.postMessage("sensitive data", "*");
+        </script>
+        
+        <!-- Hidden inputs with sensitive data -->
+        <form>
+            <input type="hidden" name="api_token" value="token_1234567890abcdef">
+            <input type="hidden" name="user_email" value="admin@example.com">
+            <input type="password" name="password" placeholder="Password">
+        </form>
+        
+        <!-- Hidden content -->
+        <div class="hidden-content">
+            <h3>Hidden Section</h3>
+            <p>This content is hidden with CSS and should be revealed by the scanner.</p>
+            <p>Credit Card: 4111111111111111</p>
+            <p>SSN: 123-45-6789</p>
+            <p>Phone: 555-123-4567</p>
+        </div>
+        
+        <!-- Data attributes with sensitive info -->
+        <div data-api-key="secret_key_12345" 
+             data-endpoint="/api/admin/users"
+             data-token="bearer_token_xyz123">
+            Content with data attributes
+        </div>
+        
+        <!-- localStorage and sessionStorage -->
+        <script>
+            localStorage.setItem('authToken', 'local_storage_token_12345');
+            localStorage.setItem('userCredentials', JSON.stringify({
+                username: 'admin',
+                password: 'admin123'
+            }));
+            
+            sessionStorage.setItem('sessionKey', 'session_key_abcdef');
+            sessionStorage.setItem('apiSecret', 'secret_api_key_789');
+        </script>
+        
+        <!-- Cookies -->
+        <script>
+            document.cookie = "sessionId=insecure_session_12345";
+            document.cookie = "authToken=auth_token_without_secure_flag";
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedTeam Security Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #bb86fc 0%, #03dac6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(187, 134, 252, 0.5);
+        }
+        .scanner-button {
+            background: linear-gradient(135deg, #bb86fc 0%, #9c6cdc 100%);
+            transition: all 0.3s ease;
+        }
+        .scanner-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(187, 134, 252, 0.3);
+        }
+        .feature-card {
+            background: rgba(42, 42, 42, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(187, 134, 252, 0.2);
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            border-color: rgba(187, 134, 252, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-purple-500">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-shield-alt text-3xl text-purple-400"></i>
+                    <h1 class="text-2xl font-bold gradient-text">RedTeam Security Scanner</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-400">v1.0.0</span>
+                    <a href="https://github.com" target="_blank" class="text-gray-400 hover:text-purple-400 transition">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Hero Section -->
+        <section class="text-center mb-16">
+            <h2 class="text-5xl font-bold mb-6 gradient-text">Enterprise-Grade Security Assessment</h2>
+            <p class="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
+                Advanced security scanning tool designed for modern web applications. 
+                Detect vulnerabilities, discover hidden endpoints, and identify sensitive data exposure.
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-8">
+                <button onclick="startScan()" class="scanner-button text-white font-semibold py-3 px-8 rounded-lg flex items-center space-x-2">
+                    <i class="fas fa-search"></i>
+                    <span>Start Security Scan</span>
+                </button>
+                <button onclick="loadBookmarklet()" class="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-8 rounded-lg transition flex items-center space-x-2">
+                    <i class="fas fa-bookmark"></i>
+                    <span>Install Bookmarklet</span>
+                </button>
+            </div>
+
+            <!-- URL Input -->
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-gray-800 rounded-lg p-6 glow">
+                    <label class="block text-left text-sm font-medium text-gray-400 mb-2">Target URL</label>
+                    <div class="flex space-x-2">
+                        <input 
+                            type="url" 
+                            id="targetUrl" 
+                            placeholder="https://example.com" 
+                            class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition"
+                        >
+                        <button onclick="scanUrl()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="mb-16">
+            <h3 class="text-3xl font-bold text-center mb-10 gradient-text">Core Features</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature Cards -->
+                <div class="feature-card rounded-lg p-6">
+                    <div class="text-purple-400 text-3xl mb-4">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Deep DOM Analysis</h4>
+                    <p class="text-gray-400">Comprehensive analysis of DOM structure, hidden elements, and dynamic content</p>
+                </div>
+
+                <div class="feature-card rounded-lg p-6">
+                    <div class="text-cyan-400 text-3xl mb-4">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Sensitive Data Detection</h4>
+                    <p class="text-gray-400">Identifies API keys, tokens, credentials, and personal information exposure</p>
+                </div>
+
+                <div class="feature-card rounded-lg p-6">
+                    <div class="text-purple-400 text-3xl mb-4">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Vulnerability Assessment</h4>
+                    <p class="text-gray-400">Detects common security vulnerabilities including XSS, CORS, and CSP issues</p>
+                </div>
+
+                <div class="feature-card rounded-lg p-6">
+                    <div class="text-cyan-400 text-3xl mb-4">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">File Discovery</h4>
+                    <p class="text-gray-400">Intelligent fuzzing to discover hidden files, backups, and configuration files</p>
+                </div>
+
+                <div class="feature-card rounded-lg p-6">
+                    <div class="text-purple-400 text-3xl mb-4">
+                        <i class="fas fa-eye-slash"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Overlay Removal</h4>
+                    <p class="text-gray-400">Remove paywalls, blur effects, and overlays that hide content</p>
+                </div>
+
+                <div class="feature-card rounded-lg p-6">
+                    <div class="text-cyan-400 text-3xl mb-4">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="text-xl font-semibold mb-2">Real-time Monitoring</h4>
+                    <p class="text-gray-400">Monitor network requests, WebSocket connections, and API calls in real-time</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Usage Instructions -->
+        <section class="mb-16">
+            <h3 class="text-3xl font-bold text-center mb-10 gradient-text">How to Use</h3>
+            <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg p-8">
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">1</div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Install the Bookmarklet</h4>
+                            <p class="text-gray-400">Drag the bookmarklet to your bookmarks bar for easy access on any website</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">2</div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Navigate to Target Site</h4>
+                            <p class="text-gray-400">Visit the website you want to scan for security vulnerabilities</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">3</div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Run the Scanner</h4>
+                            <p class="text-gray-400">Click the bookmarklet or use keyboard shortcuts to start the scan</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-purple-600 text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">4</div>
+                        <div>
+                            <h4 class="font-semibold mb-1">Review Results</h4>
+                            <p class="text-gray-400">Analyze the comprehensive security report with categorized findings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keyboard Shortcuts -->
+                <div class="mt-8 pt-8 border-t border-gray-700">
+                    <h4 class="font-semibold mb-4">Keyboard Shortcuts</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mono text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Start Scan:</span>
+                            <kbd class="bg-gray-700 px-2 py-1 rounded">Ctrl+Shift+S</kbd>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Remove Overlays:</span>
+                            <kbd class="bg-gray-700 px-2 py-1 rounded">Ctrl+Shift+R</kbd>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">View Results:</span>
+                            <kbd class="bg-gray-700 px-2 py-1 rounded">Ctrl+Shift+V</kbd>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Close Results:</span>
+                            <kbd class="bg-gray-700 px-2 py-1 rounded">Escape</kbd>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Console Commands -->
+        <section class="mb-16">
+            <h3 class="text-3xl font-bold text-center mb-10 gradient-text">Console Commands</h3>
+            <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg p-8">
+                <p class="text-gray-400 mb-6">Open the browser console and use these commands:</p>
+                <div class="space-y-4 mono">
+                    <div class="bg-gray-900 rounded p-4">
+                        <code class="text-cyan-400">RedTeamScan.start()</code>
+                        <p class="text-gray-500 text-sm mt-1">Start a comprehensive security scan</p>
+                    </div>
+                    <div class="bg-gray-900 rounded p-4">
+                        <code class="text-cyan-400">RedTeamScan.removeOverlays()</code>
+                        <p class="text-gray-500 text-sm mt-1">Remove overlays, paywalls, and blur effects</p>
+                    </div>
+                    <div class="bg-gray-900 rounded p-4">
+                        <code class="text-cyan-400">RedTeamScan.viewResults()</code>
+                        <p class="text-gray-500 text-sm mt-1">View the last scan results</p>
+                    </div>
+                    <div class="bg-gray-900 rounded p-4">
+                        <code class="text-cyan-400">RedTeamScan.exportResults()</code>
+                        <p class="text-gray-500 text-sm mt-1">Export scan results to console</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Status Section -->
+        <section id="status" class="hidden mb-16">
+            <div class="max-w-4xl mx-auto bg-gray-800 rounded-lg p-8 text-center">
+                <div class="pulse">
+                    <i class="fas fa-spinner fa-spin text-4xl text-purple-400 mb-4"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Scanning in Progress...</h3>
+                <p class="text-gray-400">Please wait while we analyze the target website</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-gray-700 py-8 mt-20">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; 2024 RedTeam Security Scanner. For educational and authorized testing purposes only.</p>
+            <p class="text-sm mt-2">Use responsibly and only on systems you have permission to test.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/src/core/scanner.js"></script>
+    <script src="/src/ui/overlayRemover.js"></script>
+    <script src="/src/ui/resultsDisplay.js"></script>
+    <script src="/src/app.js"></script>
+    
+    <script>
+        // Initialize scanner when page loads
+        let scanner = null;
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            // Scanner is auto-initialized by app.js
+            scanner = window.redteamScanner;
+        });
+        
+        function startScan() {
+            const urlInput = document.getElementById('targetUrl');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                alert('Please enter a target URL');
+                return;
+            }
+            
+            // Open URL in new tab with scanner
+            const scannerCode = `
+                (function() {
+                    const script = document.createElement('script');
+                    script.src = '${window.location.origin}/src/app.js';
+                    document.head.appendChild(script);
+                    script.onload = function() {
+                        setTimeout(() => {
+                            if (window.RedTeamScan) {
+                                window.RedTeamScan.start();
+                            }
+                        }, 1000);
+                    };
+                })();
+            `;
+            
+            const newTab = window.open(url, '_blank');
+            if (newTab) {
+                setTimeout(() => {
+                    newTab.postMessage({ action: 'runScanner', code: scannerCode }, '*');
+                }, 2000);
+            }
+        }
+        
+        function scanUrl() {
+            startScan();
+        }
+        
+        function loadBookmarklet() {
+            const bookmarkletCode = `
+javascript:(function(){
+    const s=document.createElement('script');
+    s.src='${window.location.origin}/src/app.js';
+    document.head.appendChild(s);
+})();
+            `.trim();
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gray-800 rounded-lg p-8 max-w-lg w-full mx-4">
+                    <h3 class="text-2xl font-bold mb-4 gradient-text">Install Bookmarklet</h3>
+                    <p class="text-gray-400 mb-6">Drag this button to your bookmarks bar:</p>
+                    <div class="text-center mb-6">
+                        <a href="${bookmarkletCode}" 
+                           class="scanner-button inline-block text-white font-semibold py-3 px-8 rounded-lg"
+                           onclick="alert('Drag this button to your bookmarks bar!'); return false;">
+                            🔍 RedTeam Scanner
+                        </a>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-4">Or manually create a bookmark with this code:</p>
+                    <textarea class="w-full bg-gray-700 text-gray-300 p-3 rounded mono text-xs" rows="4" readonly>${bookmarkletCode}</textarea>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            class="mt-6 bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded transition">
+                        Close
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        // Handle Enter key in URL input
+        document.getElementById('targetUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                scanUrl();
+            }
+        });
+    </script>
+</body>
+</html>
